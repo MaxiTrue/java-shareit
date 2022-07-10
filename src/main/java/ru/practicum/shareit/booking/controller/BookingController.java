@@ -1,4 +1,4 @@
-package ru.practicum.shareit.requests.model.booking.controller;
+package ru.practicum.shareit.booking.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
