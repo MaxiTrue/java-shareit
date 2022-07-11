@@ -35,8 +35,8 @@ public class UserService {
     }
 
     public Long delete(long id) throws Throwable {
-        userStorage.getById(id).
-                orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", id));
+        userStorage.getById(id)
+                .orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", id));
         return userStorage.delete(id);
     }
 
@@ -45,8 +45,8 @@ public class UserService {
     }
 
     public UserDto getById(long id) throws Throwable {
-        User user = userStorage.getById(id).
-                orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", id));
+        User user = userStorage.getById(id)
+                .orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", id));
         return userMapper.toUserDto(user);
     }
 

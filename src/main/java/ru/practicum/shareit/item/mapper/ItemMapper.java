@@ -28,8 +28,8 @@ public class ItemMapper {
                 .id(itemDto.getId())
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
-                .available(itemDto.getAvailable()).
-                owner(user).build();
+                .available(itemDto.getAvailable())
+                .owner(user).build();
 
     }
 

@@ -51,9 +51,9 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public Optional<User> getByEmail(String email) {
-        List<User> filterUsers = users.values().stream().
-                filter(user1 -> user1.getEmail().equals(email)).
-                collect(Collectors.toList());
+        List<User> filterUsers = users.values().stream()
+                .filter(user1 -> user1.getEmail().equals(email))
+                .collect(Collectors.toList());
         return filterUsers.size() == 0 ? Optional.empty() : Optional.of(filterUsers.get(0));
     }
 

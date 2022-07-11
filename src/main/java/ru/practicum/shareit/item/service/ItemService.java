@@ -10,7 +10,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Supplier;
 
 @Service
@@ -37,8 +36,8 @@ public class ItemService {
     }
 
     public ItemDto getById(long id) throws Throwable {
-        Item item = itemStorage.getById(id).
-                orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("вещь", id));
+        Item item = itemStorage.getById(id)
+                .orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("вещь", id));
         return itemMapper.toItemDto(item);
     }
 

@@ -18,22 +18,22 @@ public class UserMapper {
     private final UserStorage userStorage;
 
     public UserDto toUserDto(User user) {
-        return UserDto.builder().
-                id(user.getId()).
-                name(user.getName()).
-                email(user.getEmail()).build();
+        return UserDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail()).build();
     }
 
     public User toUserEntity(UserDto userDto) {
-        return User.builder().
-                id(userDto.getId()).
-                name(userDto.getName()).
-                email(userDto.getEmail()).build();
+        return User.builder()
+                .id(userDto.getId())
+                .name(userDto.getName())
+                .email(userDto.getEmail()).build();
     }
 
     public UserDto toUserDtoFromPartialUpdate(UserDto userDto, long userId) throws Throwable {
-        User user = userStorage.getById(userId).
-                orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", userId));
+        User user = userStorage.getById(userId)
+                .orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", userId));
 
         UserDto copyUserDto = userDto;
         copyUserDto.setId(user.getId());
