@@ -7,14 +7,12 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Repository
-public class InMemoryItemStorage implements ItemStorage{
+public class InMemoryItemStorage implements ItemStorage {
 
     private final Map<Long, Item> items = new ConcurrentHashMap<>();
-
     private static long globalId = 0;
 
     private long generateNewId() {
@@ -35,14 +33,8 @@ public class InMemoryItemStorage implements ItemStorage{
     }
 
     @Override
-    public Long delete(long id) {
-        return null;
-    }
-
-    @Override
     public Collection<Item> getAllByUserId(long userId) {
-        return items.values().stream().
-                filter(item -> item.getOwner().getId() == userId).collect(Collectors.toList());
+        return items.values().stream().filter(item -> item.getOwner().getId() == userId).collect(Collectors.toList());
     }
 
     @Override
@@ -52,12 +44,12 @@ public class InMemoryItemStorage implements ItemStorage{
 
     @Override
     public Collection<Item> getBySearch(String text) {
-        return items.values().stream().
-                filter(item -> {
-                    String nameResult = item.getName().toLowerCase().replaceAll("\\s","");
-                    String descriptionResult = item.getDescription().toLowerCase().replaceAll("\\s","");
+        return items.values().stream()
+                .filter(item -> {
+                    String nameResult = item.getName().toLowerCase().replaceAll("\\s", "");
+                    String descriptionResult = item.getDescription().toLowerCase().replaceAll("\\s", "");
                     return nameResult.contains(text) || descriptionResult.contains(text);
-                }).
-                filter(Item::getAvailable).collect(Collectors.toList());
+                })
+                .filter(Item::getAvailable).collect(Collectors.toList());
     }
 }

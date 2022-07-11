@@ -11,8 +11,6 @@ public interface ItemStorage {
 
     Item update(Item item);
 
-    Long delete(long id);
-
     Collection<Item> getAllByUserId(long userId);
 
     Optional<Item> getById(long id);

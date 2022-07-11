@@ -10,7 +10,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.Collection;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -22,33 +21,33 @@ public class ItemMapper {
     private final ItemStorage itemStorage;
 
     public Item toEntityItem(ItemDto itemDto, long userId) throws Throwable {
-        User user = userStorage.getById(userId).
-                orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", userId));
+        User user = userStorage.getById(userId)
+                .orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", userId));
 
-        return Item.builder().
-                id(itemDto.getId()).
-                name(itemDto.getName()).
-                description(itemDto.getDescription()).
-                available(itemDto.getAvailable()).
+        return Item.builder()
+                .id(itemDto.getId())
+                .name(itemDto.getName())
+                .description(itemDto.getDescription())
+                .available(itemDto.getAvailable()).
                 owner(user).build();
 
     }
 
     public ItemDto toItemDto(Item item) {
-        return ItemDto.builder().
-                id(item.getId()).
-                name(item.getName()).
-                description(item.getDescription()).
-                available(item.getAvailable()).build();
+        return ItemDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable()).build();
     }
 
-    public Collection<ItemDto> toListItemDto(Collection<Item> items){
+    public Collection<ItemDto> toListItemDto(Collection<Item> items) {
         return items.stream().map(this::toItemDto).collect(Collectors.toList());
     }
 
     public ItemDto toItemDtoFromPartialUpdate(ItemDto itemDto, long itemId, long userId) throws Throwable {
-        Item itemFromStorage = itemStorage.
-                getById(itemId).orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("вещь", itemId));
+        Item itemFromStorage = itemStorage
+                .getById(itemId).orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("вещь", itemId));
 
         if (itemFromStorage.getOwner().getId() != userId) {
             throw new ObjectNotFoundException(
@@ -64,16 +63,15 @@ public class ItemMapper {
             copyItemDto.setName(itemFromStorage.getName());
         }
 
-        if(copyItemDto.getDescription() == null){
+        if (copyItemDto.getDescription() == null) {
             copyItemDto.setDescription(itemFromStorage.getDescription());
         }
 
-        if(copyItemDto.getAvailable() == null){
+        if (copyItemDto.getAvailable() == null) {
             copyItemDto.setAvailable(itemFromStorage.getAvailable());
         }
 
         return copyItemDto;
     }
-
 
 }
