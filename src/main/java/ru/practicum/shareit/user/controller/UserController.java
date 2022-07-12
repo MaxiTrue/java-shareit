@@ -17,7 +17,6 @@ import java.util.Collection;
 public class UserController {
 
     private final UserService userService;
-    private final UserMapper userMapper;
 
     @PostMapping
     public UserDto create(@RequestBody @Valid UserDto userDto) throws Throwable {
@@ -29,7 +28,7 @@ public class UserController {
     public UserDto partialUpdate(@RequestBody UserDto userDto, @PathVariable("userId") long id)
             throws Throwable {
         log.debug("Получен запрос PATCH на частичное обновление данны пользователя id - {}", id);
-        return userService.update(userMapper.toUserDtoFromPartialUpdate(userDto, id));
+        return userService.update(userDto, id);
     }
 
     @DeleteMapping("/{userId}")

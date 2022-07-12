@@ -2,28 +2,19 @@ package ru.practicum.shareit.item.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.Collection;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class ItemMapper {
 
-    private final UserStorage userStorage;
-    private final ItemStorage itemStorage;
 
-    public Item toEntityItem(ItemDto itemDto, long userId) throws Throwable {
-        User user = userStorage.getById(userId)
-                .orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", userId));
-
+    public Item toEntityItem(ItemDto itemDto, User user) {
         return Item.builder()
                 .id(itemDto.getId())
                 .name(itemDto.getName())
@@ -45,15 +36,7 @@ public class ItemMapper {
         return items.stream().map(this::toItemDto).collect(Collectors.toList());
     }
 
-    public ItemDto toItemDtoFromPartialUpdate(ItemDto itemDto, long itemId, long userId) throws Throwable {
-        Item itemFromStorage = itemStorage
-                .getById(itemId).orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("вещь", itemId));
-
-        if (itemFromStorage.getOwner().getId() != userId) {
-            throw new ObjectNotFoundException(
-                    String.format("вещь с  id - (%d) и владельцем id - (%d)",
-                            itemFromStorage.getId(), userId));
-        }
+    public ItemDto toItemDtoFromPartialUpdate(ItemDto itemDto, Item itemFromStorage) throws Throwable {
 
         ItemDto copyItemDto = itemDto;
 

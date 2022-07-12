@@ -23,15 +23,23 @@ public class UserService {
     private final UserMapper userMapper;
 
     public UserDto create(UserDto userDto) throws Throwable {
-        validUserDto("POST", userDto);
+        validUserDto(userDto);
         User user = userMapper.toUserEntity(userDto);
         return userMapper.toUserDto(userStorage.create(user));
     }
 
-    public UserDto update(UserDto userDto) throws Throwable {
-        validUserDto("PATCH", userDto);
-        return userMapper.toUserDto(userStorage.update(userMapper.toUserEntity(userDto)));
+    public UserDto update(UserDto userDto, long id) throws Throwable {
+        //проверяем наличие обновляемого объекта, если существует то получаем для мапинга в единый DTO объект
+        User user = userStorage.getById(id)
+                .orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", id));
+        UserDto fullUserDto = userMapper.toUserDtoFromPartialUpdate(userDto, user);
 
+        //валидация собранного объекта
+        validUserDto(fullUserDto);
+
+        //собираем объект для хранения в БД
+        User userFromStorage = userMapper.toUserEntity(userDto);
+        return userMapper.toUserDto(userStorage.update(userFromStorage));
     }
 
     public Long delete(long id) throws Throwable {
@@ -50,14 +58,7 @@ public class UserService {
         return userMapper.toUserDto(user);
     }
 
-    private void validUserDto(String method, UserDto userDto) throws
-            ValidException, ObjectNotFoundException, NotUniqueEmailException {
-
-        if (!method.equals("POST")) {
-            if (userDto.getId() <= 0) {
-                throw new ObjectNotFoundException("пользователь", userDto.getId());
-            }
-        }
+    private void validUserDto(UserDto userDto) throws ValidException, NotUniqueEmailException {
 
         if (userDto.getName() == null || userDto.getEmail() == null) {
             throw new ValidException("Поля не должны равняться null!");

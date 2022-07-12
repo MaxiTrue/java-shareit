@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.constraints.NotNull;
@@ -20,7 +19,6 @@ import java.util.Collection;
 public class ItemController {
 
     private final ItemService itemService;
-    private final ItemMapper itemMapper;
 
     @PostMapping
     public ItemDto create(@RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") @NotNull long userId)
@@ -34,8 +32,7 @@ public class ItemController {
                                  @PathVariable("itemId") long itemId,
                                  @RequestHeader("X-Sharer-User-Id") @NotNull long userId) throws Throwable {
         log.debug("Получен запрос PATCH на обновление данных вещи от пользователя id - {}", userId);
-        ItemDto fullItemDto = itemMapper.toItemDtoFromPartialUpdate(itemDto, itemId, userId);
-        return itemService.update(fullItemDto, userId);
+        return itemService.update(itemDto, itemId, userId);
     }
 
     @GetMapping

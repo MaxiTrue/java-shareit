@@ -8,6 +8,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.Collection;
 import java.util.function.Supplier;
@@ -17,17 +19,37 @@ import java.util.function.Supplier;
 public class ItemService {
 
     private final ItemStorage itemStorage;
+    private final UserStorage userStorage;
     private final ItemMapper itemMapper;
 
     public ItemDto create(ItemDto itemDto, long userId) throws Throwable {
-        validItemDto("POST", itemDto);
-        Item item = itemMapper.toEntityItem(itemDto, userId);
+        validItemDto(itemDto);
+        User user = userStorage.getById(userId)
+                .orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", userId));
+        Item item = itemMapper.toEntityItem(itemDto, user);
         return itemMapper.toItemDto(itemStorage.create(item));
     }
 
-    public ItemDto update(ItemDto itemDto, long userId) throws Throwable {
-        validItemDto("PATH", itemDto);
-        Item item = itemMapper.toEntityItem(itemDto, userId);
+    public ItemDto update(ItemDto itemDto, long itemId, long userId) throws Throwable {
+        //проверяем наличие обновляемого объекта, если существует то получаем для мапинга в единый DTO объект
+        Item itemFromStorage = itemStorage
+                .getById(itemId).orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("вещь", itemId));
+
+        //проверяем является ли пользователь с пришедшим id автором поста
+        if (itemFromStorage.getOwner().getId() != userId) {
+            throw new ObjectNotFoundException(
+                    String.format("вещь с  id - (%d) и владельцем id - (%d)",
+                            itemFromStorage.getId(), userId));
+        }
+        ItemDto fullItemDto = itemMapper.toItemDtoFromPartialUpdate(itemDto, itemFromStorage);
+
+        //валидация собранного объекта
+        validItemDto(fullItemDto);
+
+        //собираем объект для хранения в БД
+        User user = userStorage.getById(userId)
+                .orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", userId));
+        Item item = itemMapper.toEntityItem(itemDto, user);
         return itemMapper.toItemDto(itemStorage.update(item));
     }
 
@@ -45,13 +67,7 @@ public class ItemService {
         return itemMapper.toListItemDto(itemStorage.getBySearch(text));
     }
 
-    private void validItemDto(String method, ItemDto itemDto) throws ObjectNotFoundException, ValidException {
-
-        if (!method.equals("POST")) {
-            if (itemDto.getId() <= 0) {
-                throw new ObjectNotFoundException("вещь", itemDto.getId());
-            }
-        }
+    private void validItemDto(ItemDto itemDto) throws ValidException {
 
         if (itemDto.getName() == null || itemDto.getDescription() == null || itemDto.getAvailable() == null) {
             throw new ValidException("Поля не должны равняться null!");
