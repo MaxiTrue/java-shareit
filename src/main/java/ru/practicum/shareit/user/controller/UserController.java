@@ -39,13 +39,13 @@ public class UserController {
     @GetMapping
     public Collection<UserDto> getAll() {
         log.debug("Получен запрос GET на получение всех пользователей");
-        return userService.getAllByUserId();
+        return userService.findAll();
     }
 
     @GetMapping("/{userId}")
     public UserDto getById(@PathVariable("userId") long id) throws Throwable {
         log.debug("Получен запрос GET на получение пользователя по id - {}", id);
-        return userService.getById(id);
+        return userService.findById(id);
     }
 
 }

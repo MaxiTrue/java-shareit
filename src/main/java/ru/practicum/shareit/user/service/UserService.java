@@ -19,18 +19,19 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class UserService {
 
+
     private final UserStorage userStorage;
     private final UserMapper userMapper;
 
     public UserDto create(UserDto userDto) throws Throwable {
         validUserDto(userDto);
         User user = userMapper.toUserEntity(userDto);
-        return userMapper.toUserDto(userStorage.create(user));
+        return userMapper.toUserDto(userStorage.save(user));
     }
 
     public UserDto update(UserDto userDto, long id) throws Throwable {
         //проверяем наличие обновляемого объекта, если существует то получаем для мапинга в единый DTO объект
-        User user = userStorage.getById(id)
+        User user = userStorage.findById(id)
                 .orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", id));
         UserDto fullUserDto = userMapper.toUserDtoFromPartialUpdate(userDto, user);
 
@@ -39,21 +40,22 @@ public class UserService {
 
         //собираем объект для хранения в БД
         User userFromStorage = userMapper.toUserEntity(userDto);
-        return userMapper.toUserDto(userStorage.update(userFromStorage));
+        return userMapper.toUserDto(userStorage.save(userFromStorage));
     }
 
     public Long delete(long id) throws Throwable {
-        userStorage.getById(id)
+        User user = userStorage.findById(id)
                 .orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", id));
-        return userStorage.delete(id);
+        userStorage.delete(user);
+        return id;
     }
 
-    public Collection<UserDto> getAllByUserId() {
-        return userMapper.toListResponseUserDto(userStorage.getAll());
+    public Collection<UserDto> findAll() {
+        return userMapper.toListResponseUserDto(userStorage.findAll());
     }
 
-    public UserDto getById(long id) throws Throwable {
-        User user = userStorage.getById(id)
+    public UserDto findById(long id) throws Throwable {
+        User user = userStorage.findById(id)
                 .orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", id));
         return userMapper.toUserDto(user);
     }
@@ -74,14 +76,6 @@ public class UserService {
 
         if (!userDto.getEmail().contains("@")) {
             throw new ValidException("Поле email не соответствует нужному формату!");
-        }
-
-        Optional<User> user = userStorage.getByEmail(userDto.getEmail());
-
-        if (user.isPresent()) {
-            if (user.get().getId() != userDto.getId()) {
-                throw new NotUniqueEmailException("Этот email - " + userDto.getEmail() + " уже используется!");
-            }
         }
 
     }

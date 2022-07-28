@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.mapper;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
@@ -10,17 +9,16 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class ItemMapper {
 
-
     public Item toEntityItem(ItemDto itemDto, User user) {
-        return Item.builder()
-                .id(itemDto.getId())
-                .name(itemDto.getName())
-                .description(itemDto.getDescription())
-                .available(itemDto.getAvailable())
-                .owner(user).build();
+        Item item = new Item();
+        item.setId(itemDto.getId());
+        item.setName(itemDto.getName());
+        item.setDescription(itemDto.getDescription());
+        item.setAvailable(itemDto.getAvailable());
+        item.setOwner(user);
+        return item;
 
     }
 

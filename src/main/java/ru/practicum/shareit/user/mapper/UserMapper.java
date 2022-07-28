@@ -20,10 +20,11 @@ public class UserMapper {
     }
 
     public User toUserEntity(UserDto userDto) {
-        return User.builder()
-                .id(userDto.getId())
-                .name(userDto.getName())
-                .email(userDto.getEmail()).build();
+        User user = new User();
+        user.setId(userDto.getId());
+        user.setName(userDto.getName());
+        user.setEmail(userDto.getEmail());
+        return user;
     }
 
     public UserDto toUserDtoFromPartialUpdate(UserDto userDto, User user) throws Throwable {

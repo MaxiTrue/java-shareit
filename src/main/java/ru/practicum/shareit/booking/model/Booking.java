@@ -1,17 +1,33 @@
 package ru.practicum.shareit.booking.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Data
-@Builder
+@Entity
+@Table(name = "bookings")
+@Getter @Setter @ToString @EqualsAndHashCode(of = "id")
 public class Booking {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private LocalDate start;
-    private LocalDate end;
+    @Column(name = "start_date_time")
+    private LocalDateTime start;
+    @Column(name = "end_date_time")
+    private LocalDateTime end;
+    @ManyToOne
+    @JoinColumn(name = "item_id")
     private Item item;
-    private String status; //TODO пока строка, потом посмотрю как сделать
+    @ManyToOne
+    @JoinColumn(name = "booker_id")
+    private User booker;
+    @Enumerated(EnumType.STRING)
+    private StateBooking status = StateBooking.WAITING;
 }

@@ -24,16 +24,16 @@ public class ItemService {
 
     public ItemDto create(ItemDto itemDto, long userId) throws Throwable {
         validItemDto(itemDto);
-        User user = userStorage.getById(userId)
+        User user = userStorage.findById(userId)
                 .orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", userId));
         Item item = itemMapper.toEntityItem(itemDto, user);
-        return itemMapper.toItemDto(itemStorage.create(item));
+        return itemMapper.toItemDto(itemStorage.save(item));
     }
 
     public ItemDto update(ItemDto itemDto, long itemId, long userId) throws Throwable {
         //проверяем наличие обновляемого объекта, если существует то получаем для мапинга в единый DTO объект
         Item itemFromStorage = itemStorage
-                .getById(itemId).orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("вещь", itemId));
+                .findById(itemId).orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("вещь", itemId));
 
         //проверяем является ли пользователь с пришедшим id автором поста
         if (itemFromStorage.getOwner().getId() != userId) {
@@ -47,24 +47,24 @@ public class ItemService {
         validItemDto(fullItemDto);
 
         //собираем объект для хранения в БД
-        User user = userStorage.getById(userId)
+        User user = userStorage.findById(userId)
                 .orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("пользователь", userId));
         Item item = itemMapper.toEntityItem(itemDto, user);
-        return itemMapper.toItemDto(itemStorage.update(item));
+        return itemMapper.toItemDto(itemStorage.save(item));
     }
 
     public Collection<ItemDto> getAllByUserId(long userId) {
-        return itemMapper.toListItemDto(itemStorage.getAllByUserId(userId));
+        return itemMapper.toListItemDto(itemStorage.findAllByOwnerId(userId));
     }
 
     public ItemDto getById(long id) throws Throwable {
-        Item item = itemStorage.getById(id)
+        Item item = itemStorage.findById(id)
                 .orElseThrow((Supplier<Throwable>) () -> new ObjectNotFoundException("вещь", id));
         return itemMapper.toItemDto(item);
     }
 
     public Collection<ItemDto> getBySearch(String text) {
-        return itemMapper.toListItemDto(itemStorage.getBySearch(text));
+        return itemMapper.toListItemDto(itemStorage.searchByNameAndDescription(text));
     }
 
     private void validItemDto(ItemDto itemDto) throws ValidException {
