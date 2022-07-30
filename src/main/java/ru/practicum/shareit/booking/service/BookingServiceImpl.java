@@ -99,12 +99,14 @@ public class BookingServiceImpl implements BookingService {
             case "CURRENT":
                 bookings = bookingStorage
                         .findAllByStatusAndDateBetweenStartAndEnd(userId, StateBooking.APPROVED, LocalDateTime.now());
+                break;
             case "PAST":
                 bookings = bookingStorage
                         .findAllByBookerIdAndStatusAndEndBeforeOrderByStartDesc(
                                 userId,
                                 StateBooking.APPROVED,
                                 LocalDateTime.now());
+                break;
             case "FUTURE":
                 bookings = bookingStorage
                         .findAllByBookerIdAndStatusAndStartAfterOrderByStartDesc(
@@ -140,12 +142,14 @@ public class BookingServiceImpl implements BookingService {
                                 userId,
                                 StateBooking.APPROVED,
                                 LocalDateTime.now());
+                break;
             case "PAST":
                 bookings = bookingStorage
                         .findAllBookingByOwnerItemsAndStatusAndEndBefore(
                                 userId,
                                 StateBooking.APPROVED,
                                 LocalDateTime.now());
+                break;
             case "FUTURE":
                 bookings = bookingStorage
                         .findAllBookingByOwnerItemsAndStatusAndStartAfter(
