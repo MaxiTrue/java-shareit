@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.storage;
 
-import org.hibernate.sql.Select;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.model.Booking;
@@ -14,9 +13,7 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
 
     //все актиыне и будущие бронирования
     List<Booking> findAllByItemIdAndStatusAndEndAfterOrderByStartAsc(
-            Long item_id,
-            StateBooking status,
-            LocalDateTime end);
+            Long itemId, StateBooking status, LocalDateTime end);
 
 
     /**
