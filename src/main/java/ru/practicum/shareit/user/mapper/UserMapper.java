@@ -6,6 +6,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -27,7 +28,7 @@ public class UserMapper {
         return user;
     }
 
-    public UserDto toUserDtoFromPartialUpdate(UserDto userDto, User user) throws Throwable {
+    public UserDto toUserDtoFromPartialUpdate(UserDto userDto, User user) {
         UserDto copyUserDto = userDto;
         copyUserDto.setId(user.getId());
         if (copyUserDto.getName() == null) copyUserDto.setName(user.getName());
@@ -35,7 +36,7 @@ public class UserMapper {
         return copyUserDto;
     }
 
-    public Collection<UserDto> toListResponseUserDto(Collection<User> users) {
+    public List<UserDto> toListResponseUserDto(Collection<User> users) {
         return users.stream().map(this::toUserDto).collect(Collectors.toList());
     }
 

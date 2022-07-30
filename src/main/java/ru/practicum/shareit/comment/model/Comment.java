@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.model;
+package ru.practicum.shareit.comment.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,22 +11,18 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "bookings")
+@Table(name = "comments")
 @Getter @Setter @ToString @EqualsAndHashCode(of = "id")
-public class Booking {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    @Column(name = "start_date_time")
-    private LocalDateTime start;
-    @Column(name = "end_date_time")
-    private LocalDateTime end;
+    private Long id;
+    private String text;
     @ManyToOne
     @JoinColumn(name = "item_id")
     private Item item;
     @ManyToOne
-    @JoinColumn(name = "booker_id")
-    private User booker;
-    @Enumerated(EnumType.STRING)
-    private StateBooking status = StateBooking.WAITING;
+    @JoinColumn(name = "author_id")
+    private User author;
+    private LocalDateTime created;
 }

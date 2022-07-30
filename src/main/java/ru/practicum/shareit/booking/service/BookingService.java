@@ -2,18 +2,21 @@ package ru.practicum.shareit.booking.service;
 
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.ResponseBookingDto;
+import ru.practicum.shareit.exception.ObjectNotFoundException;
+import ru.practicum.shareit.exception.ValidException;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface BookingService {
 
-    ResponseBookingDto create(BookingDto bookingDto, long userId) throws Throwable;
+    ResponseBookingDto create(BookingDto bookingDto, long userId) throws ObjectNotFoundException, ValidException;
 
-    ResponseBookingDto updateStatus(long bookingId, boolean approved, long userId) throws Throwable;
+    ResponseBookingDto updateStatus(long bookingId, boolean approved, long userId)
+            throws ObjectNotFoundException, ValidException;
 
-    ResponseBookingDto findById(long bookingId, long userid) throws Throwable;
+    ResponseBookingDto findById(long bookingId, long userid) throws ObjectNotFoundException;
 
-    Collection<ResponseBookingDto> findAllBookingByBooker(long userId, String state) throws Throwable;
+    List<ResponseBookingDto> findAllBookingByBooker(long userId, String state) throws ObjectNotFoundException;
 
-    Collection<ResponseBookingDto> findAllBookingForOwnerByAllItems(long userId, String state) throws Throwable;
+    List<ResponseBookingDto> findAllBookingForOwnerByAllItems(long userId, String state) throws ObjectNotFoundException;
 }

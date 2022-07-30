@@ -4,16 +4,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface ItemStorage extends JpaRepository<Item, Long> {
 
-    Collection<Item> findAllByOwnerId(Long userId);
+    List<Item> findAllByOwnerId(Long userId);
 
     @Query(
             "SELECT i FROM Item i WHERE LOWER(i.name) LIKE LOWER(CONCAT('%', ?1, '%'))" +
                     "OR LOWER(i.description) LIKE LOWER(CONCAT('%', ?1, '%')) AND i.available = true"
     )
-    Collection<Item> searchByNameAndDescription(String text);
+    List<Item> searchByNameAndDescription(String text);
 
 }
