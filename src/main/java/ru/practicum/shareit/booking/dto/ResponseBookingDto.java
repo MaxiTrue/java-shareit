@@ -17,7 +17,9 @@ public class ResponseBookingDto {
     private Booker booker;
     private StateBooking status;
 
-    @Builder @Getter @Setter
+    @Builder
+    @Getter
+    @Setter
     public static class Booker {
         private Long id;
         private String name;
@@ -28,7 +30,9 @@ public class ResponseBookingDto {
         }
     }
 
-    @Builder @Getter @Setter
+    @Builder
+    @Getter
+    @Setter
     public static class ItemB {
         private Long id;
         private String name;

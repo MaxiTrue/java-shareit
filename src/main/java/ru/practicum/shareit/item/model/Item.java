@@ -8,7 +8,10 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "items")
-@Getter @Setter @ToString @EqualsAndHashCode(of = "id")
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(of = "id")
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

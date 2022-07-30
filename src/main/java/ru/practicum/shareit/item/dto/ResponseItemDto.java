@@ -18,13 +18,19 @@ public class ResponseItemDto {
     private BookingFromItem nextBooking;
     private Set<CommentFromItem> comments;
 
-    @Builder @Getter @Setter @AllArgsConstructor
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
     public static class BookingFromItem {
         private Long id;
         private Long bookerId;
     }
 
-    @Builder @Getter @Setter @AllArgsConstructor
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
     public static class CommentFromItem {
         private Long id;
         private String text;
