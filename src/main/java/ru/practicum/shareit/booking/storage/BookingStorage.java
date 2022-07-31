@@ -62,16 +62,6 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :userId AND b.status = :status ORDER BY b.start DESC")
     List<Booking> findAllBookingByOwnerItemsAndStatus(long userId, StateBooking status);
 
-    /**
-     * @Query("SELECT b FROM Booking b " +
-     * "WHERE b.item.owner.id = :userId AND b.status = :status AND :now BETWEEN b.start AND b.end " +
-     * "ORDER BY b.start DESC")
-     * List<Booking> findAllBookingByOwnerItemsAndStatusAndDateBetweenStartAndEnd(
-     * long userId,
-     * StateBooking status,
-     * LocalDateTime now);
-     */
-
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = :userId AND :now BETWEEN b.start AND b.end " +
             "ORDER BY b.start DESC")
