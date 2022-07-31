@@ -86,7 +86,7 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> bookings = new LinkedList<>();
         switch (state) {
             case "ALL":
-                bookings = bookingStorage.findAllByBooker_IdOrderByStartDesc(userId);
+                bookings = bookingStorage.findAllByBookerIdOrderByStartDesc(userId);
                 break;
             case "WAITING":
                 bookings = bookingStorage

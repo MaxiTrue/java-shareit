@@ -21,7 +21,7 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
      */
 
     //все бронирования по id бронирующего
-    List<Booking> findAllByBooker_IdOrderByStartDesc(long userId);
+    List<Booking> findAllByBookerIdOrderByStartDesc(long userId);
 
     //все бронирвоания по статусу и по id бронирующего
     List<Booking> findAllByStatusAndBookerIdOrderByStartDesc(StateBooking status, long userId);
@@ -35,8 +35,9 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
 
     //все бронирвоания по статусу, id бронирующего и текущее время между стартом и окнчанием бронироания
     @Query(
-            "select b from Booking b " +
-                    "Where b.booker.id = ?1 AND b.status = ?2 and ?3 between b.start and b.end ORDER BY b.start desc")
+            "SELECT b FROM Booking b " +
+                    "WHERE b.booker.id = :userId AND b.status = :status AND :now BETWEEN b.start AND b.end " +
+                    "ORDER BY b.start DESC")
     List<Booking> findAllByStatusAndDateBetweenStartAndEnd(long userId, StateBooking status, LocalDateTime now);
 
     //все бронирвоания по статусу, id бронирующего и окончанию бронирования раньше текущего времени
@@ -55,28 +56,29 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
      * методы для нахождения всех объектов бронирования пользователя(для влядельца вещей) в зависимости от состояния
      */
 
-    @Query("select b From Booking b Where b.item.owner.id = ?1 order by b.start desc")
+    @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :userId ORDER BY b.start DESC")
     List<Booking> findAllBookingByOwnerItems(long userId);
 
-    @Query("select b From Booking b Where b.item.owner.id = ?1 And b.status = ?2 order by b.start desc")
+    @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :userId AND b.status = :status ORDER BY b.start DESC")
     List<Booking> findAllBookingByOwnerItemsAndStatus(long userId, StateBooking status);
 
-    @Query("select b From Booking b " +
-            "Where b.item.owner.id = ?1 And b.status = ?2 And ?3 between b.start and b.end order by b.start desc")
+    @Query("SELECT b FROM Booking b " +
+            "WHERE b.item.owner.id = :userId AND b.status = :status AND :now BETWEEN b.start AND b.end " +
+            "ORDER BY b.start DESC")
     List<Booking> findAllBookingByOwnerItemsAndStatusAndDateBetweenStartAndEnd(
             long userId,
             StateBooking status,
             LocalDateTime now);
 
-    @Query("select b From Booking b " +
-            "Where b.item.owner.id = ?1 And b.status = ?2 And b.end < ?3 order by b.start desc")
+    @Query("SELECT b FROM Booking b " +
+            "WHERE b.item.owner.id = :userId AND b.status = :status AND b.end < :now ORDER BY b.start DESC")
     List<Booking> findAllBookingByOwnerItemsAndStatusAndEndBefore(
             long userId,
             StateBooking status,
             LocalDateTime now);
 
-    @Query("select b From Booking b " +
-            "Where b.item.owner.id = ?1 And b.status = ?2 And b.start > ?3 order by b.start desc")
+    @Query("SELECT b FROM Booking b " +
+            "WHERE b.item.owner.id = :userId AND b.status = :status AND b.start > :now ORDER BY b.start DESC")
     List<Booking> findAllBookingByOwnerItemsAndStatusAndStartAfter(
             long userId,
             StateBooking status,
@@ -85,15 +87,14 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
     /**
      * методы для нахождения последнего и следующего бронирования
      */
-    @Query(value = "(Select * from bookings as b " +
-            "where b.status = 'APPROVED' AND b.end_date_time < ?1 order by b.end_date_time desc limit 1)",
+    @Query(value = "(SELECT * FROM bookings AS b " +
+            "WHERE b.status = 'APPROVED' AND b.end_date_time < :now ORDER BY b.end_date_time DESC limit 1)",
             nativeQuery = true)
     Optional<Booking> findLastBooking(LocalDateTime now);
 
-    @Query(value = "(Select * from bookings as bo " +
-            "where bo.status = 'APPROVED' AND bo.start_date_time > ?1 order by bo.start_date_time desc limit 1)",
+    @Query(value = "(SELECT * FROM bookings AS bo " +
+            "WHERE bo.status = 'APPROVED' AND bo.start_date_time > :now ORDER BY bo.start_date_time DESC limit 1)",
             nativeQuery = true)
     Optional<Booking> findNextBooking(LocalDateTime now);
-
 
 }

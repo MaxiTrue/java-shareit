@@ -10,10 +10,8 @@ public interface ItemStorage extends JpaRepository<Item, Long> {
 
     List<Item> findAllByOwnerId(Long userId);
 
-    @Query(
-            "SELECT i FROM Item i WHERE LOWER(i.name) LIKE LOWER(CONCAT('%', ?1, '%'))" +
-                    "OR LOWER(i.description) LIKE LOWER(CONCAT('%', ?1, '%')) AND i.available = true"
-    )
+    @Query("SELECT i FROM Item i WHERE LOWER(i.name) LIKE LOWER(CONCAT('%', :text, '%'))" +
+                    "OR LOWER(i.description) LIKE LOWER(CONCAT('%', :text, '%')) AND i.available = true")
     List<Item> searchByNameAndDescription(String text);
 
 }
