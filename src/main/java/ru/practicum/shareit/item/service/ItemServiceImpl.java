@@ -69,10 +69,10 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ResponseItemDto> getAllByUserId(long userId) {
 
-        return itemStorage.findAllByOwnerId(userId).stream().map(item -> {
+        return itemStorage.findAllByOwnerIdOrderByIdAsc(userId).stream().map(item -> {
             LocalDateTime now = LocalDateTime.now();
-            Optional<Booking> lastBooking = bookingStorage.findLastBooking(now);
-            Optional<Booking> nextBooking = bookingStorage.findNextBooking(now);
+            Optional<Booking> lastBooking = bookingStorage.findLastBooking(item.getId(), now);
+            Optional<Booking> nextBooking = bookingStorage.findNextBooking(item.getId(), now);
             Set<Comment> comments = commentStorage.findAllByItemIdOrderByCreatedDesc(item.getId());
             return itemMapper.toResponseItemDto(
                     item,
@@ -93,8 +93,8 @@ public class ItemServiceImpl implements ItemService {
         //формируем ответ для владельца вещи
         if (item.getOwner().getId() == userId) {
             LocalDateTime now = LocalDateTime.now();
-            Optional<Booking> lastBooking = bookingStorage.findLastBooking(now);
-            Optional<Booking> nextBooking = bookingStorage.findNextBooking(now);
+            Optional<Booking> lastBooking = bookingStorage.findLastBooking(item.getId(), now);
+            Optional<Booking> nextBooking = bookingStorage.findNextBooking(item.getId(), now);
 
             return itemMapper.toResponseItemDto(
                     item,

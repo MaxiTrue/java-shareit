@@ -16,7 +16,7 @@ public interface BookingService {
 
     ResponseBookingDto findById(long bookingId, long userid) throws ObjectNotFoundException;
 
-    List<ResponseBookingDto> findAllBookingByBooker(long userId, String state) throws ObjectNotFoundException;
+    List<ResponseBookingDto> findAllBookingByBooker(long userId, String state) throws ValidException;
 
-    List<ResponseBookingDto> findAllBookingForOwnerByAllItems(long userId, String state) throws ObjectNotFoundException;
+    List<ResponseBookingDto> findAllBookingForOwnerByAllItems(long userId, String state) throws ValidException;
 }

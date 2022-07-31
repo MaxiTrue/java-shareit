@@ -48,7 +48,7 @@ public class BookController {
     @GetMapping
     public Collection<ResponseBookingDto> findAllBookingByBooker(
             @RequestParam(value = "state", defaultValue = "ALL", required = false) String state,
-            @RequestHeader("X-Sharer-User-Id") @NotNull long userId) throws ObjectNotFoundException {
+            @RequestHeader("X-Sharer-User-Id") @NotNull long userId) throws ValidException {
         log.debug("Получен запрос GET на получение всех бронирований пользователя - {} с статусом - {}", userId, state);
         String stateResult = state.toUpperCase().replaceAll("\\s", "");
         return bookingService.findAllBookingByBooker(userId, stateResult);
@@ -57,7 +57,7 @@ public class BookController {
     @GetMapping("/owner")
     public Collection<ResponseBookingDto> findAllBookingForOwnerByAllItems(
             @RequestParam(value = "state", defaultValue = "ALL", required = false) String state,
-            @RequestHeader("X-Sharer-User-Id") @NotNull long userId) throws ObjectNotFoundException {
+            @RequestHeader("X-Sharer-User-Id") @NotNull long userId) throws ValidException {
         log.debug("Получен запрос GET на получение всех бронирований пользователя - {}, по всем вещам с статусом - {}",
                 userId, state);
         String stateResult = state.toUpperCase().replaceAll("\\s", "");

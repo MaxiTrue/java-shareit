@@ -16,6 +16,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -80,85 +81,58 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<ResponseBookingDto> findAllBookingByBooker(long userId, String state)
-            throws ObjectNotFoundException {
-        if (!userStorage.existsById(userId)) throw new ObjectNotFoundException("пользователь", userId);
-        List<Booking> bookings = new LinkedList<>();
+    public List<ResponseBookingDto> findAllBookingByBooker(long userId, String state) throws ValidException {
+        if (!userStorage.existsById(userId)) return new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
         switch (state) {
             case "ALL":
-                bookings = bookingStorage.findAllByBookerIdOrderByStartDesc(userId);
-                break;
+                return bookingMapper.toResponseBookingDto(bookingStorage.findAllByBookerIdOrderByStartDesc(userId));
             case "WAITING":
-                bookings = bookingStorage
-                        .findAllByStatusAndBookerIdOrderByStartDesc(StateBooking.WAITING, userId);
-                break;
+                return bookingMapper.toResponseBookingDto(bookingStorage
+                        .findAllByStatusAndBookerIdOrderByStartDesc(StateBooking.WAITING, userId));
             case "REJECTED":
-                bookings = bookingStorage
-                        .findAllByStatusAndBookerIdOrderByStartDesc(StateBooking.REJECTED, userId);
-                break;
+                return bookingMapper.toResponseBookingDto(bookingStorage
+                        .findAllByStatusAndBookerIdOrderByStartDesc(StateBooking.REJECTED, userId));
             case "CURRENT":
-                bookings = bookingStorage
-                        .findAllByStatusAndDateBetweenStartAndEnd(userId, StateBooking.APPROVED, LocalDateTime.now());
-                break;
+                return bookingMapper.toResponseBookingDto(bookingStorage
+                        .findAllByDateBetweenStartAndEnd(userId, now));
             case "PAST":
-                bookings = bookingStorage
-                        .findAllByBookerIdAndStatusAndEndBeforeOrderByStartDesc(
-                                userId,
-                                StateBooking.APPROVED,
-                                LocalDateTime.now());
-                break;
+                return bookingMapper.toResponseBookingDto(bookingStorage
+                        .findAllByBookerIdAndStatusAndEndBeforeOrderByStartDesc(userId, StateBooking.APPROVED, now));
             case "FUTURE":
-                bookings = bookingStorage
-                        .findAllByBookerIdAndStatusAndStartAfterOrderByStartDesc(
-                                userId,
-                                StateBooking.APPROVED,
-                                LocalDateTime.now());
+                return bookingMapper.toResponseBookingDto(bookingStorage
+                        .findAllByBookerIdAndStatusNotAndStartAfterOrderByStartDesc(
+                                userId, StateBooking.REJECTED, now));
+            default:
+                throw new ValidException("Unknown state: " + state);
         }
-        return bookings.size() == 0 ? new LinkedList<>() : bookingMapper.toResponseBookingDto(bookings);
     }
 
     @Override
-    public List<ResponseBookingDto> findAllBookingForOwnerByAllItems(long userId, String state)
-            throws ObjectNotFoundException {
-        if (!userStorage.existsById(userId)) throw new ObjectNotFoundException("пользователь", userId);
-        List<Booking> bookings = new LinkedList<>();
+    public List<ResponseBookingDto> findAllBookingForOwnerByAllItems(long userId, String state) throws ValidException {
+        if (!userStorage.existsById(userId)) return new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
         switch (state) {
             case "ALL":
-                bookings = bookingStorage.findAllBookingByOwnerItems(userId);
-                break;
+                return bookingMapper.toResponseBookingDto(bookingStorage.findAllBookingByOwnerItems(userId));
             case "WAITING":
-                bookings = bookingStorage.findAllBookingByOwnerItemsAndStatus(
-                        userId,
-                        StateBooking.WAITING);
-                break;
+                return bookingMapper.toResponseBookingDto(
+                        bookingStorage.findAllBookingByOwnerItemsAndStatus(userId, StateBooking.WAITING));
             case "REJECTED":
-                bookings = bookingStorage.findAllBookingByOwnerItemsAndStatus(
-                        userId,
-                        StateBooking.REJECTED);
-                break;
+                return bookingMapper.toResponseBookingDto(
+                        bookingStorage.findAllBookingByOwnerItemsAndStatus(userId, StateBooking.REJECTED));
             case "CURRENT":
-                bookings = bookingStorage
-                        .findAllBookingByOwnerItemsAndStatusAndDateBetweenStartAndEnd(
-                                userId,
-                                StateBooking.APPROVED,
-                                LocalDateTime.now());
-                break;
+                return bookingMapper.toResponseBookingDto(bookingStorage
+                        .findAllBookingByOwnerItemsAndStatusAndDateBetweenStartAndEnd(userId, now));
             case "PAST":
-                bookings = bookingStorage
-                        .findAllBookingByOwnerItemsAndStatusAndEndBefore(
-                                userId,
-                                StateBooking.APPROVED,
-                                LocalDateTime.now());
-                break;
+                return bookingMapper.toResponseBookingDto(bookingStorage
+                        .findAllBookingByOwnerItemsAndStatusAndEndBefore(userId, StateBooking.APPROVED, now));
             case "FUTURE":
-                bookings = bookingStorage
-                        .findAllBookingByOwnerItemsAndStatusAndStartAfter(
-                                userId,
-                                StateBooking.APPROVED,
-                                LocalDateTime.now());
+                return bookingMapper.toResponseBookingDto(bookingStorage
+                        .findAllBookingByOwnerItemsAndStatusAndStartAfter(userId, StateBooking.REJECTED, now));
+            default:
+                throw new ValidException("Unknown state: " + state);
         }
-
-        return bookings.size() == 0 ? new LinkedList<>() : bookingMapper.toResponseBookingDto(bookings);
     }
 
     private void validBookingDto(BookingDto bookingDto) throws ValidException {

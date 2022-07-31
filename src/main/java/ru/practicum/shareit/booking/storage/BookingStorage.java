@@ -33,12 +33,12 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             StateBooking status,
             LocalDateTime now);
 
-    //все бронирвоания по статусу, id бронирующего и текущее время между стартом и окнчанием бронироания
+    //все бронирвоания по id бронирующего и текущее время между стартом и окнчанием бронироания
     @Query(
             "SELECT b FROM Booking b " +
-                    "WHERE b.booker.id = :userId AND b.status = :status AND :now BETWEEN b.start AND b.end " +
+                    "WHERE b.booker.id = :userId AND :now BETWEEN b.start AND b.end " +
                     "ORDER BY b.start DESC")
-    List<Booking> findAllByStatusAndDateBetweenStartAndEnd(long userId, StateBooking status, LocalDateTime now);
+    List<Booking> findAllByDateBetweenStartAndEnd(long userId, LocalDateTime now);
 
     //все бронирвоания по статусу, id бронирующего и окончанию бронирования раньше текущего времени
     List<Booking> findAllByBookerIdAndStatusAndEndBeforeOrderByStartDesc(
@@ -47,7 +47,7 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             LocalDateTime now);
 
     //все бронирвоания по статусу и начало бронирования позже текущего времени
-    List<Booking> findAllByBookerIdAndStatusAndStartAfterOrderByStartDesc(
+    List<Booking> findAllByBookerIdAndStatusNotAndStartAfterOrderByStartDesc(
             long userId,
             StateBooking status,
             LocalDateTime now);
@@ -62,13 +62,20 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :userId AND b.status = :status ORDER BY b.start DESC")
     List<Booking> findAllBookingByOwnerItemsAndStatus(long userId, StateBooking status);
 
+    /**
+     * @Query("SELECT b FROM Booking b " +
+     * "WHERE b.item.owner.id = :userId AND b.status = :status AND :now BETWEEN b.start AND b.end " +
+     * "ORDER BY b.start DESC")
+     * List<Booking> findAllBookingByOwnerItemsAndStatusAndDateBetweenStartAndEnd(
+     * long userId,
+     * StateBooking status,
+     * LocalDateTime now);
+     */
+
     @Query("SELECT b FROM Booking b " +
-            "WHERE b.item.owner.id = :userId AND b.status = :status AND :now BETWEEN b.start AND b.end " +
+            "WHERE b.item.owner.id = :userId AND :now BETWEEN b.start AND b.end " +
             "ORDER BY b.start DESC")
-    List<Booking> findAllBookingByOwnerItemsAndStatusAndDateBetweenStartAndEnd(
-            long userId,
-            StateBooking status,
-            LocalDateTime now);
+    List<Booking> findAllBookingByOwnerItemsAndStatusAndDateBetweenStartAndEnd(long userId, LocalDateTime now);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = :userId AND b.status = :status AND b.end < :now ORDER BY b.start DESC")
@@ -78,7 +85,7 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             LocalDateTime now);
 
     @Query("SELECT b FROM Booking b " +
-            "WHERE b.item.owner.id = :userId AND b.status = :status AND b.start > :now ORDER BY b.start DESC")
+            "WHERE b.item.owner.id = :userId AND b.status <> :status AND b.start > :now ORDER BY b.start DESC")
     List<Booking> findAllBookingByOwnerItemsAndStatusAndStartAfter(
             long userId,
             StateBooking status,
@@ -88,13 +95,13 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
      * методы для нахождения последнего и следующего бронирования
      */
     @Query(value = "(SELECT * FROM bookings AS b " +
-            "WHERE b.status = 'APPROVED' AND b.end_date_time < :now ORDER BY b.end_date_time DESC limit 1)",
+            "WHERE b.item_id = :itemId AND b.end_date_time < :now ORDER BY b.end_date_time DESC limit 1)",
             nativeQuery = true)
-    Optional<Booking> findLastBooking(LocalDateTime now);
+    Optional<Booking> findLastBooking(long itemId, LocalDateTime now);
 
-    @Query(value = "(SELECT * FROM bookings AS bo " +
-            "WHERE bo.status = 'APPROVED' AND bo.start_date_time > :now ORDER BY bo.start_date_time DESC limit 1)",
+    @Query(value = "(SELECT * FROM bookings AS b " +
+            "WHERE b.item_id = :itemId AND b.start_date_time > :now ORDER BY b.start_date_time DESC limit 1)",
             nativeQuery = true)
-    Optional<Booking> findNextBooking(LocalDateTime now);
+    Optional<Booking> findNextBooking(long itemId, LocalDateTime now);
 
 }
