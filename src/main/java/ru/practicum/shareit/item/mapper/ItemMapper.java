@@ -6,6 +6,7 @@ import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ResponseItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.requests.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.item.dto.ResponseItemDto.BookingFromItem;
 import ru.practicum.shareit.item.dto.ResponseItemDto.CommentFromItem;
@@ -19,13 +20,15 @@ import java.util.stream.Collectors;
 @Component
 public class ItemMapper {
 
-    public Item toEntityItem(ItemDto itemDto, User user) {
+    //WARNING аргумент itemRequest может быть NULL
+    public Item toEntityItem(ItemDto itemDto, User user, ItemRequest itemRequest) {
         Item item = new Item();
         item.setId(itemDto.getId());
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
         item.setOwner(user);
+        item.setRequest(itemRequest);
         return item;
 
     }
@@ -35,7 +38,8 @@ public class ItemMapper {
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
-                .available(item.getAvailable()).build();
+                .available(item.getAvailable())
+                .requestId(item.getRequest() != null ? item.getRequest().getId() : null).build();
     }
 
     public List<ItemDto> toListItemDto(Collection<Item> items) {
@@ -90,6 +94,7 @@ public class ItemMapper {
         itemDtoFromOwner.setName(item.getName());
         itemDtoFromOwner.setDescription(item.getDescription());
         itemDtoFromOwner.setAvailable(item.getAvailable());
+        itemDtoFromOwner.setRequestId(item.getRequest() != null ? item.getRequest().getId() : null);
         itemDtoFromOwner.setLastBooking(lastBooking);
         itemDtoFromOwner.setNextBooking(nextBooking);
         itemDtoFromOwner.setComments(commentsFromItem);

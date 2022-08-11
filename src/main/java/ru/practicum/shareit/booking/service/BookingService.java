@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.ResponseBookingDto;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
@@ -16,7 +17,9 @@ public interface BookingService {
 
     ResponseBookingDto findById(long bookingId, long userid) throws ObjectNotFoundException;
 
-    List<ResponseBookingDto> findAllBookingByBooker(long userId, String state) throws ValidException;
+    List<ResponseBookingDto> findAllBookingByBooker(long userId, String state, Pageable pageable)
+            throws ValidException, ObjectNotFoundException;
 
-    List<ResponseBookingDto> findAllBookingForOwnerByAllItems(long userId, String state) throws ValidException;
+    List<ResponseBookingDto> findAllBookingForOwnerByAllItems(long userId, String state, Pageable pageable)
+            throws ValidException, ObjectNotFoundException;
 }

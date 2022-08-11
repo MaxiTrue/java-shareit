@@ -33,10 +33,11 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDto create(CommentDto commentDto, long itemId, long authorId)
             throws ObjectNotFoundException, ValidException {
+        LocalDateTime now = LocalDateTime.now();
         Item item = itemStorage.findById(itemId).orElseThrow(() -> new ObjectNotFoundException("вещь", itemId));
         User author = userStorage.findById(authorId).orElseThrow(() -> new ObjectNotFoundException("вещь", itemId));
         List<Booking> bookings = bookingStorage.findAllByItemIdAndBookerIdAndStatusAndEndBeforeOrderByEndDesc(
-                itemId, authorId, StateBooking.APPROVED, LocalDateTime.now());
+                itemId, authorId, StateBooking.APPROVED, now);
         if (bookings.size() == 0) {
             throw new ValidException("Пользователь id - " + authorId + " не бронировал вещь id - " + itemId);
         }

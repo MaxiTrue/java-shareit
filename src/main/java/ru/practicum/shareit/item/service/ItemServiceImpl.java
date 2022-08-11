@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.storage.BookingStorage;
@@ -13,6 +14,8 @@ import ru.practicum.shareit.item.dto.ResponseItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.requests.model.ItemRequest;
+import ru.practicum.shareit.requests.storage.ItemRequestStorage;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
@@ -30,6 +33,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserStorage userStorage;
     private final BookingStorage bookingStorage;
     private final CommentStorage commentStorage;
+    private final ItemRequestStorage itemRequestStorage;
 
     private final ItemMapper itemMapper;
 
@@ -38,7 +42,7 @@ public class ItemServiceImpl implements ItemService {
         validItemDto(itemDto);
         User user = userStorage.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("пользователь", userId));
-        Item item = itemMapper.toEntityItem(itemDto, user);
+                Item item = itemMapper.toEntityItem(itemDto, user, findItemRequestFromItemDto(itemDto));
         return itemMapper.toItemDto(itemStorage.save(item));
     }
 
@@ -62,14 +66,15 @@ public class ItemServiceImpl implements ItemService {
         //собираем объект для хранения в БД
         User user = userStorage.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("пользователь", userId));
-        Item item = itemMapper.toEntityItem(itemDto, user);
+        Item item = itemMapper.toEntityItem(itemDto, user, findItemRequestFromItemDto(itemDto));
         return itemMapper.toItemDto(itemStorage.save(item));
     }
 
     @Override
-    public List<ResponseItemDto> getAllByUserId(long userId) {
+    public List<ResponseItemDto> findAllByUserId(long userId, Pageable pageable) throws ObjectNotFoundException {
+        if(!userStorage.existsById(userId)) throw new ObjectNotFoundException("пользователь", userId);
 
-        return itemStorage.findAllByOwnerIdOrderByIdAsc(userId).stream().map(item -> {
+        return itemStorage.findAllByOwnerIdOrderByIdAsc(userId, pageable).get().map(item -> {
             LocalDateTime now = LocalDateTime.now();
             Optional<Booking> lastBooking = bookingStorage.findLastBooking(item.getId(), now);
             Optional<Booking> nextBooking = bookingStorage.findNextBooking(item.getId(), now);
@@ -83,9 +88,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ResponseItemDto getById(long id, long userId) throws ObjectNotFoundException {
-        Item item = itemStorage.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("вещь", id));
+    public ResponseItemDto findById(long itemId, long userId) throws ObjectNotFoundException {
+        Item item = itemStorage.findById(itemId)
+                .orElseThrow(() -> new ObjectNotFoundException("вещь", itemId));
 
         //получаем комментарии
         Set<Comment> comments = commentStorage.findAllByItemIdOrderByCreatedDesc(item.getId());
@@ -107,8 +112,16 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getBySearch(String text) {
-        return itemMapper.toListItemDto(itemStorage.searchByNameAndDescription(text));
+    public List<ItemDto> findBySearch(String text, Pageable pageable) {
+        return itemMapper.toListItemDto(itemStorage.searchByNameAndDescription(text, pageable).getContent());
+    }
+
+    //WARNING метод может вернуть NULL
+    private ItemRequest findItemRequestFromItemDto(ItemDto itemDto) throws ObjectNotFoundException {
+        if (itemDto.getRequestId() == null) return null;
+        return itemRequestStorage.findById(itemDto.getRequestId())
+                .orElseThrow(() -> new ObjectNotFoundException("запрос", itemDto.getRequestId()));
+
     }
 
     private void validItemDto(ItemDto itemDto) throws ValidException {

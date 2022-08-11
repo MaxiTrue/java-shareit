@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.storage;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.model.Booking;
@@ -13,7 +15,9 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
 
     //все актиыне и будущие бронирования
     List<Booking> findAllByItemIdAndStatusAndEndAfterOrderByStartAsc(
-            Long itemId, StateBooking status, LocalDateTime end);
+            Long itemId,
+            StateBooking status,
+            LocalDateTime end);
 
 
     /**
@@ -21,10 +25,10 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
      */
 
     //все бронирования по id бронирующего
-    List<Booking> findAllByBookerIdOrderByStartDesc(long userId);
+    Page<Booking> findAllByBookerIdOrderByStartDesc(long userId, Pageable pageable);
 
     //все бронирвоания по статусу и по id бронирующего
-    List<Booking> findAllByStatusAndBookerIdOrderByStartDesc(StateBooking status, long userId);
+    Page<Booking> findAllByStatusAndBookerIdOrderByStartDesc(StateBooking status, long userId, Pageable pageable);
 
     //все оконченные бронирования одного пользователя одной вещи
     List<Booking> findAllByItemIdAndBookerIdAndStatusAndEndBeforeOrderByEndDesc(
@@ -38,48 +42,55 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             "SELECT b FROM Booking b " +
                     "WHERE b.booker.id = :userId AND :now BETWEEN b.start AND b.end " +
                     "ORDER BY b.start DESC")
-    List<Booking> findAllByDateBetweenStartAndEnd(long userId, LocalDateTime now);
+    Page<Booking> findAllByDateBetweenStartAndEnd(long userId, LocalDateTime now, Pageable pageable);
 
     //все бронирвоания по статусу, id бронирующего и окончанию бронирования раньше текущего времени
-    List<Booking> findAllByBookerIdAndStatusAndEndBeforeOrderByStartDesc(
+    Page<Booking> findAllByBookerIdAndStatusAndEndBeforeOrderByStartDesc(
             long userId,
             StateBooking status,
-            LocalDateTime now);
+            LocalDateTime now,
+            Pageable pageable);
 
     //все бронирвоания по статусу и начало бронирования позже текущего времени
-    List<Booking> findAllByBookerIdAndStatusNotAndStartAfterOrderByStartDesc(
+    Page<Booking> findAllByBookerIdAndStatusNotAndStartAfterOrderByStartDesc(
             long userId,
             StateBooking status,
-            LocalDateTime now);
+            LocalDateTime now,
+            Pageable pageable);
 
     /**
-     * методы для нахождения всех объектов бронирования пользователя(для влядельца вещей) в зависимости от состояния
+     * методы для нахождения всех объектов бронирования пользователя(для владельца вещей) в зависимости от состояния
      */
 
     @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :userId ORDER BY b.start DESC")
-    List<Booking> findAllBookingByOwnerItems(long userId);
+    Page<Booking> findAllBookingByOwnerItems(long userId, Pageable pageable);
 
     @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :userId AND b.status = :status ORDER BY b.start DESC")
-    List<Booking> findAllBookingByOwnerItemsAndStatus(long userId, StateBooking status);
+    Page<Booking> findAllBookingByOwnerItemsAndStatus(long userId, StateBooking status, Pageable pageable);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = :userId AND :now BETWEEN b.start AND b.end " +
             "ORDER BY b.start DESC")
-    List<Booking> findAllBookingByOwnerItemsAndStatusAndDateBetweenStartAndEnd(long userId, LocalDateTime now);
+    Page<Booking> findAllBookingByOwnerItemsAndStatusAndDateBetweenStartAndEnd(
+            long userId,
+            LocalDateTime now,
+            Pageable pageable);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = :userId AND b.status = :status AND b.end < :now ORDER BY b.start DESC")
-    List<Booking> findAllBookingByOwnerItemsAndStatusAndEndBefore(
+    Page<Booking> findAllBookingByOwnerItemsAndStatusAndEndBefore(
             long userId,
             StateBooking status,
-            LocalDateTime now);
+            LocalDateTime now,
+            Pageable pageable);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = :userId AND b.status <> :status AND b.start > :now ORDER BY b.start DESC")
-    List<Booking> findAllBookingByOwnerItemsAndStatusAndStartAfter(
+    Page<Booking> findAllBookingByOwnerItemsAndStatusAndStartAfter(
             long userId,
             StateBooking status,
-            LocalDateTime now);
+            LocalDateTime now,
+            Pageable pageable);
 
     /**
      * методы для нахождения последнего и следующего бронирования
