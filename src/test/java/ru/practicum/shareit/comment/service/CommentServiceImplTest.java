@@ -2,7 +2,6 @@ package ru.practicum.shareit.comment.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -12,7 +11,6 @@ import ru.practicum.shareit.booking.model.StateBooking;
 import ru.practicum.shareit.booking.storage.BookingStorage;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.exception.ValidException;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.model.User;
@@ -24,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.OPTIONAL;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 
@@ -41,7 +38,7 @@ class CommentServiceImplTest {
 
     @Test
     public void shouldThrowValidExceptionWhenUserNotBookedItemAndWantCreatingComment() {
-       User user = new User();
+        User user = new User();
         user.setId(1L);
         user.setName("Max");
         user.setEmail("maxiTrue@gmail.ru");
@@ -60,7 +57,7 @@ class CommentServiceImplTest {
                 anyLong(), anyLong(), any(StateBooking.class), any(LocalDateTime.class));
         ValidException exception = assertThrows(
                 ValidException.class,
-                () -> commentService.create(any(CommentDto.class), anyLong(), anyLong())
+                () -> commentService.create(new CommentDto(), 1L, 1L)
         );
         assertThat(exception.getMessage()).isEqualTo("Пользователь id - 1 не бронировал вещь id - 1");
     }

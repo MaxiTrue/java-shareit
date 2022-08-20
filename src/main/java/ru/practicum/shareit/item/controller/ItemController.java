@@ -10,6 +10,7 @@ import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.exception.ValidException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ResponseItemDto;
+import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 
 import javax.validation.constraints.Min;
@@ -24,7 +25,7 @@ import java.util.Collection;
 @Slf4j
 public class ItemController {
 
-    private final ItemServiceImpl itemService;
+    private final ItemService itemService;
 
     @PostMapping
     public ItemDto create(@RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") @NotNull long userId)
@@ -43,7 +44,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public Collection<ResponseItemDto> getAllByUserId(
+    public Collection<ResponseItemDto> findAllByUserId(
             @RequestHeader("X-Sharer-User-Id") @NotNull long userId,
             @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
             @RequestParam(name = "size", defaultValue = "5") @Min(1) int size) throws ObjectNotFoundException {
@@ -53,7 +54,7 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ResponseItemDto getById(
+    public ResponseItemDto findById(
             @PathVariable("itemId") long id,
             @RequestHeader("X-Sharer-User-Id") @NotNull long userId) throws ObjectNotFoundException {
         log.debug("Получен запрос GET на получение вещи id - {}", id);
@@ -61,7 +62,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public Collection<ItemDto> getBySearch(
+    public Collection<ItemDto> findBySearch(
             @RequestParam("text") String text,
             @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
             @RequestParam(name = "size", defaultValue = "5") @Min(1) int size) {

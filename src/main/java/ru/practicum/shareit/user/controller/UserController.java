@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.exception.ValidException;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import javax.validation.Valid;
@@ -17,15 +18,15 @@ import java.util.Collection;
 @Slf4j
 public class UserController {
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     @PostMapping
-    public UserDto create(@RequestBody @Valid UserDto userDto) throws ValidException {
+    public UserDto create(@RequestBody UserDto userDto) throws ValidException {
         log.debug("Получен запрос POST на создание пользователя с email - {}", userDto.getEmail());
         return userService.create(userDto);
     }
 
-    @PatchMapping("{userId}")
+    @PatchMapping("/{userId}")
     public UserDto update(@RequestBody UserDto userDto, @PathVariable("userId") long id)
             throws ObjectNotFoundException, ValidException {
         log.debug("Получен запрос PATCH на частичное обновление данны пользователя id - {}", id);
@@ -39,13 +40,13 @@ public class UserController {
     }
 
     @GetMapping
-    public Collection<UserDto> getAll() {
+    public Collection<UserDto> findAll() {
         log.debug("Получен запрос GET на получение всех пользователей");
         return userService.findAll();
     }
 
     @GetMapping("/{userId}")
-    public UserDto getById(@PathVariable("userId") long id) throws ObjectNotFoundException {
+    public UserDto findById(@PathVariable("userId") long id) throws ObjectNotFoundException {
         log.debug("Получен запрос GET на получение пользователя по id - {}", id);
         return userService.findById(id);
     }

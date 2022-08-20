@@ -40,7 +40,7 @@ public class BookingServiceImpl implements BookingService {
                 .findById(bookingDto.getItemId())
                 .orElseThrow(() -> new ObjectNotFoundException("вещь", bookingDto.getItemId()));
         if (!item.getAvailable()) throw new ValidException("Вещь не доступна для бронирования");
-        if (item.getOwner().getId() == userId) throw new ObjectNotFoundException("вещь", item.getId());
+        if (item.getOwner().getId() == userId) throw new ObjectNotFoundException("Нельзя бронировать свою вещь");
         validBookingDto(bookingDto); // валидация данных
         Booking booking = bookingMapper.toEntityBooking(bookingDto, booker, item); //получение сущности из компонентов
         Booking bookingFromStorage = bookingStorage.save(booking); //сохранение в БД
