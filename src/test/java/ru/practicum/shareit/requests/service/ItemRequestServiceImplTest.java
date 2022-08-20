@@ -30,7 +30,7 @@ class ItemRequestServiceImplTest {
     private static ItemRequestDto itemRequestDto;
 
     @BeforeAll
-    public static void beforeAll(){
+    public static void beforeAll() {
         itemRequestDto = ItemRequestDto.builder()
                 .id(0)
                 .description("Нужен перфоратор")
