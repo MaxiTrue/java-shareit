@@ -3,12 +3,13 @@ package ru.practicum.shareit.item.storage;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.storage.UserStorage;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -16,13 +17,12 @@ import java.util.List;
 public class ItemStorageTest {
 
     @Autowired
-    private TestEntityManager tem;
-
+    private ItemStorage itemRepository;
     @Autowired
-    private ItemStorage repository;
+    private UserStorage userStorage;
 
     @Test
-    public void test() {
+    public void searchByNameAndDescription() {
         //подготовка данных
         User user = new User(); //владелец
         user.setId(1L);
@@ -37,8 +37,15 @@ public class ItemStorageTest {
         String text = "добро"; //текст поиска
         Pageable pageable = PageRequest.of(0, 5);
 
-        tem.persist(item);
+        //сохраняем
+        userStorage.save(user);
+        itemRepository.save(item);
 
-        List<Item> items = repository.searchByNameAndDescription(text, pageable).getContent();
+        //получаем
+        List<Item> items = itemRepository.searchByNameAndDescription(text, pageable).getContent();
+
+        //тестируем
+        assertThat(items).hasSize(1);
+        assertThat(items.get(0).getName()).isEqualTo(item.getName());
     }
 }

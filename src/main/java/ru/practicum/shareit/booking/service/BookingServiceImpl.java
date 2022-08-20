@@ -98,7 +98,7 @@ public class BookingServiceImpl implements BookingService {
                                 StateBooking.REJECTED, userId, pageable).getContent());
             case "CURRENT":
                 return bookingMapper.toResponseBookingDto(
-                        bookingStorage.findAllByDateBetweenStartAndEnd(userId, now, pageable).getContent());
+                        bookingStorage.findAllByBookerIdAndDateBetweenStartAndEnd(userId, now, pageable).getContent());
             case "PAST":
                 return bookingMapper.toResponseBookingDto(
                         bookingStorage.findAllByBookerIdAndStatusAndEndBeforeOrderByStartDesc(
@@ -120,18 +120,19 @@ public class BookingServiceImpl implements BookingService {
         switch (state) {
             case "ALL":
                 return bookingMapper.toResponseBookingDto(
-                        bookingStorage.findAllBookingByOwnerItems(userId, pageable).getContent());
+                        bookingStorage.findAllByItemOwnerIdOrderByStartDesc(userId, pageable).getContent());
+
             case "WAITING":
                 return bookingMapper.toResponseBookingDto(
-                        bookingStorage.findAllBookingByOwnerItemsAndStatus(
+                        bookingStorage.findAllByItemOwnerIdAndStatusOrderByStartDesc(
                                 userId, StateBooking.WAITING, pageable).getContent());
             case "REJECTED":
                 return bookingMapper.toResponseBookingDto(
-                        bookingStorage.findAllBookingByOwnerItemsAndStatus(
+                        bookingStorage.findAllByItemOwnerIdAndStatusOrderByStartDesc(
                                 userId, StateBooking.REJECTED, pageable).getContent());
             case "CURRENT":
                 return bookingMapper.toResponseBookingDto(bookingStorage
-                        .findAllBookingByOwnerItemsAndStatusAndDateBetweenStartAndEnd(
+                        .findAllBookingByOwnerItemsAndDateBetweenStartAndEnd(
                                 userId, now, pageable).getContent());
             case "PAST":
                 return bookingMapper.toResponseBookingDto(bookingStorage

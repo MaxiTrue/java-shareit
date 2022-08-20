@@ -37,12 +37,11 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             StateBooking status,
             LocalDateTime now);
 
-    //все бронирвоания по id бронирующего и текущее время между стартом и окнчанием бронироания
-    @Query(
-            "SELECT b FROM Booking b " +
+    //все бронирвоания по id бронирующего и текущее время между стартом и окончанием бронироания
+    @Query("SELECT b FROM Booking b " +
                     "WHERE b.booker.id = :userId AND :now BETWEEN b.start AND b.end " +
                     "ORDER BY b.start DESC")
-    Page<Booking> findAllByDateBetweenStartAndEnd(long userId, LocalDateTime now, Pageable pageable);
+    Page<Booking> findAllByBookerIdAndDateBetweenStartAndEnd(long userId, LocalDateTime now, Pageable pageable);
 
     //все бронирвоания по статусу, id бронирующего и окончанию бронирования раньше текущего времени
     Page<Booking> findAllByBookerIdAndStatusAndEndBeforeOrderByStartDesc(
@@ -62,16 +61,14 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
      * методы для нахождения всех объектов бронирования пользователя(для владельца вещей) в зависимости от состояния
      */
 
-    @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :userId ORDER BY b.start DESC")
-    Page<Booking> findAllBookingByOwnerItems(long userId, Pageable pageable);
+    Page<Booking> findAllByItemOwnerIdOrderByStartDesc(long userId, Pageable pageable);
 
-    @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :userId AND b.status = :status ORDER BY b.start DESC")
-    Page<Booking> findAllBookingByOwnerItemsAndStatus(long userId, StateBooking status, Pageable pageable);
+    Page<Booking> findAllByItemOwnerIdAndStatusOrderByStartDesc(long userId, StateBooking status, Pageable pageable);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = :userId AND :now BETWEEN b.start AND b.end " +
             "ORDER BY b.start DESC")
-    Page<Booking> findAllBookingByOwnerItemsAndStatusAndDateBetweenStartAndEnd(
+    Page<Booking> findAllBookingByOwnerItemsAndDateBetweenStartAndEnd(
             long userId,
             LocalDateTime now,
             Pageable pageable);

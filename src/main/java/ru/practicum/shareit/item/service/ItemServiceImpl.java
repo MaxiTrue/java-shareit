@@ -42,7 +42,7 @@ public class ItemServiceImpl implements ItemService {
         validItemDto(itemDto);
         User user = userStorage.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("пользователь", userId));
-                Item item = itemMapper.toEntityItem(itemDto, user, findItemRequestFromItemDto(itemDto));
+        Item item = itemMapper.toEntityItem(itemDto, user, findItemRequestFromItemDto(itemDto));
         return itemMapper.toItemDto(itemStorage.save(item));
     }
 
@@ -72,7 +72,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ResponseItemDto> findAllByUserId(long userId, Pageable pageable) throws ObjectNotFoundException {
-        if(!userStorage.existsById(userId)) throw new ObjectNotFoundException("пользователь", userId);
+        if (!userStorage.existsById(userId)) throw new ObjectNotFoundException("пользователь", userId);
 
         return itemStorage.findAllByOwnerIdOrderByIdAsc(userId, pageable).get().map(item -> {
             LocalDateTime now = LocalDateTime.now();
