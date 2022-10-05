@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.exception.ValidException;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -13,9 +14,9 @@ public interface ItemService {
 
     ItemDto update(ItemDto itemDto, long itemId, long userId) throws ObjectNotFoundException, ValidException;
 
-    List<ResponseItemDto> getAllByUserId(long userId);
+    List<ResponseItemDto> findAllByUserId(long userId, Pageable pageable) throws ObjectNotFoundException;
 
-    ResponseItemDto getById(long id, long userId) throws ObjectNotFoundException;
+    ResponseItemDto findById(long itemId, long userId) throws ObjectNotFoundException;
 
-    List<ItemDto> getBySearch(String text);
+    List<ItemDto> findBySearch(String text, Pageable pageable);
 }

@@ -2,14 +2,17 @@ package ru.practicum.shareit.item.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.exception.ValidException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ResponseItemDto;
-import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.item.service.ItemService;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,7 +24,7 @@ import java.util.Collection;
 @Slf4j
 public class ItemController {
 
-    private final ItemServiceImpl itemService;
+    private final ItemService itemService;
 
     @PostMapping
     public ItemDto create(@RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") @NotNull long userId)
@@ -31,34 +34,42 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto partialUpdate(@RequestBody ItemDto itemDto,
-                                 @PathVariable("itemId") long itemId,
-                                 @RequestHeader("X-Sharer-User-Id") @NotNull long userId)
-            throws ObjectNotFoundException, ValidException {
+    public ItemDto partialUpdate(
+            @RequestBody ItemDto itemDto,
+            @PathVariable("itemId") long itemId,
+            @RequestHeader("X-Sharer-User-Id") @NotNull long userId) throws ObjectNotFoundException, ValidException {
         log.debug("Получен запрос PATCH на обновление данных вещи от пользователя id - {}", userId);
         return itemService.update(itemDto, itemId, userId);
     }
 
     @GetMapping
-    public Collection<ResponseItemDto> getAllByUserId(@RequestHeader("X-Sharer-User-Id") @NotNull long userId) {
+    public Collection<ResponseItemDto> findAllByUserId(
+            @RequestHeader("X-Sharer-User-Id") @NotNull long userId,
+            @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
+            @RequestParam(name = "size", defaultValue = "5") @Min(1) int size) throws ObjectNotFoundException {
         log.debug("Получен запрос GET на получение всех вещей пользователя id - {}", userId);
-        return itemService.getAllByUserId(userId);
+        Pageable pageable = PageRequest.of(from, size);
+        return itemService.findAllByUserId(userId, pageable);
     }
 
     @GetMapping("/{itemId}")
-    public ResponseItemDto getById(@PathVariable("itemId") long id,
-                                   @RequestHeader("X-Sharer-User-Id") @NotNull long userId)
-            throws ObjectNotFoundException {
+    public ResponseItemDto findById(
+            @PathVariable("itemId") long id,
+            @RequestHeader("X-Sharer-User-Id") @NotNull long userId) throws ObjectNotFoundException {
         log.debug("Получен запрос GET на получение вещи id - {}", id);
-        return itemService.getById(id, userId);
+        return itemService.findById(id, userId);
     }
 
     @GetMapping("/search")
-    public Collection<ItemDto> getBySearch(@RequestParam("text") String text) {
+    public Collection<ItemDto> findBySearch(
+            @RequestParam("text") String text,
+            @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
+            @RequestParam(name = "size", defaultValue = "5") @Min(1) int size) {
         log.debug("Получен запрос GET на поиск вещи по тексту - {}", text);
         String textResult = text.toLowerCase().replaceAll("\\s", "");
         if (textResult.isEmpty()) return new ArrayList<>();
-        return itemService.getBySearch(textResult);
+        Pageable pageable = PageRequest.of(from, size);
+        return itemService.findBySearch(textResult, pageable);
     }
 
 }

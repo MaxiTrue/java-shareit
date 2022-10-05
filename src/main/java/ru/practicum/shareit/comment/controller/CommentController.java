@@ -22,10 +22,10 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto create(@RequestBody @Valid CommentDto commentDto,
-                             @PathVariable("itemId") long itemId,
-                             @RequestHeader("X-Sharer-User-Id") @NotNull long userId)
-            throws ObjectNotFoundException, ValidException {
+    public CommentDto create(
+            @RequestBody @Valid CommentDto commentDto,
+            @PathVariable("itemId") long itemId,
+            @RequestHeader("X-Sharer-User-Id") @NotNull long userId) throws ObjectNotFoundException, ValidException {
         log.debug("Получен запрос POST на создание комментария от пользователя - {}", userId);
         return commentService.create(commentDto, itemId, userId);
     }

@@ -26,11 +26,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(UserDto userDto, long id)
-            throws ObjectNotFoundException, ValidException {
+    public UserDto update(UserDto userDto, long id) throws ObjectNotFoundException, ValidException {
         //проверяем наличие обновляемого объекта, если существует то получаем для мапинга в единый DTO объект
-        User user = userStorage.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("пользователь", id));
+        User user = userStorage.findById(id).orElseThrow(() -> new ObjectNotFoundException("пользователь", id));
         UserDto fullUserDto = userMapper.toUserDtoFromPartialUpdate(userDto, user);
 
         //валидация собранного объекта
@@ -43,8 +41,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Long delete(long id) throws ObjectNotFoundException {
-        User user = userStorage.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("пользователь", id));
+        User user = userStorage.findById(id).orElseThrow(() -> new ObjectNotFoundException("пользователь", id));
         userStorage.delete(user);
         return id;
     }
@@ -56,8 +53,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findById(long id) throws ObjectNotFoundException {
-        User user = userStorage.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("пользователь", id));
+        User user = userStorage.findById(id).orElseThrow(() -> new ObjectNotFoundException("пользователь", id));
         return userMapper.toUserDto(user);
     }
 
