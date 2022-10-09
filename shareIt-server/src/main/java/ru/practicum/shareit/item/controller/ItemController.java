@@ -66,7 +66,7 @@ public class ItemController {
         log.debug("Получен запрос GET на поиск вещи по тексту - {}", text);
         String textResult = text.toLowerCase().replaceAll("\\s", "");
         if (textResult.isEmpty()) return new ArrayList<>();
-        Pageable pageable = PageRequest.of(from/size, size);
+        Pageable pageable = PageRequest.of(from / size, size);
         return itemService.findBySearch(textResult, pageable);
     }
 

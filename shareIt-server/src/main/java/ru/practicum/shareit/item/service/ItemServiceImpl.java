@@ -42,7 +42,7 @@ public class ItemServiceImpl implements ItemService {
         User user = userStorage.findById(userId).orElseThrow(() -> new ObjectNotFoundException("пользователь", userId));
 
         ItemRequest itemRequest = null;
-        if(itemDto.getRequestId() != null) {
+        if (itemDto.getRequestId() != null) {
             itemRequest = itemRequestStorage.findById(itemDto.getRequestId())
                     .orElseThrow(() -> new ObjectNotFoundException("запрос", itemDto.getRequestId()));
         }
